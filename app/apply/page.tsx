@@ -6,12 +6,12 @@ import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { formatIDR } from "@/lib/utils";
 import { loadSessionApplicant, type SessionApplicant } from "@/lib/session-data";
 import { CheckCircle2, PenSquare, ArrowRight, ShieldCheck, FileText, AlertCircle } from "lucide-react";
+import { Field } from "@/components/molecules/field";
+import { Row } from "@/components/molecules/row";
 
 export default function ApplyPage() {
   return (
@@ -208,22 +208,3 @@ function ApplyInner() {
   );
 }
 
-function Field({
-  label, value, type, className, placeholder,
-}: { label: string; value: string; type?: string; className?: string; placeholder?: string }) {
-  return (
-    <div className={className}>
-      <Label className="text-xs text-muted-foreground">{label}</Label>
-      <Input defaultValue={value} type={type} placeholder={placeholder} className="mt-1" />
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-    </div>
-  );
-}

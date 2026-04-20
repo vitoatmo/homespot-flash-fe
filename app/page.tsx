@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PropertyCard } from "@/components/property-card";
 import { listProperties } from "@/lib/data/properties";
+import { Row } from "@/components/molecules/row";
 import {
   Zap, Brain, Glasses, PenSquare, Clock, ShieldCheck,
   CheckCircle2, ArrowRight, Sparkles,
@@ -170,15 +171,6 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg bg-white/10 px-4 py-2 backdrop-blur">
       <div className="text-xs text-white/70">{label}</div>
       <div className="text-base font-semibold">{value}</div>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
     </div>
   );
 }

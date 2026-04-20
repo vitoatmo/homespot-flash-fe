@@ -3,6 +3,7 @@ import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { SessionTimer } from "@/components/session-timer";
+import { JourneyProgress } from "@/components/organisms/journey-progress";
 
 export const metadata: Metadata = {
   title: "Homespot Flash Service — AI Approval, Instant Buy Decision",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body>
         <Nav />
+        <JourneyProgress />
         <main className="min-h-[calc(100vh-8rem)]">{children}</main>
         <Footer />
         <SessionTimer />

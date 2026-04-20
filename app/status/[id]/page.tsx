@@ -7,6 +7,8 @@ import { statusTimeline, dummyUser, aiScoreDummy } from "@/lib/data/user";
 import { findProperty } from "@/lib/data/properties";
 import { formatIDR } from "@/lib/utils";
 import { CheckCircle2, Clock, Loader2, MessageCircle, Phone, FileText } from "lucide-react";
+import { Row } from "@/components/molecules/row";
+import { Stat } from "@/components/molecules/stat";
 
 export default async function StatusPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -122,22 +124,6 @@ export default async function StatusPage({ params }: { params: Promise<{ id: str
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="font-semibold">{value}</div>
-    </div>
-  );
-}
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-    </div>
-  );
-}
 function Doc({ name, src, pending }: { name: string; src: string; pending?: boolean }) {
   return (
     <li className="flex items-center justify-between rounded-lg border px-3 py-2">
