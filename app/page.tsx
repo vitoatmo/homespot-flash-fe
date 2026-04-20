@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PropertyCard } from "@/components/property-card";
-import { properties } from "@/lib/data/properties";
+import { listProperties } from "@/lib/data/properties";
 import {
   Zap, Brain, Glasses, PenSquare, Clock, ShieldCheck,
   CheckCircle2, ArrowRight, Sparkles,
 } from "lucide-react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featured = await listProperties();
+  const pick = featured.slice(0, 3);
   return (
     <>
       {/* HERO */}
@@ -138,7 +140,7 @@ export default function HomePage() {
           </Button>
         </div>
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {properties.slice(0, 3).map((p) => <PropertyCard key={p.id} p={p} />)}
+          {pick.map((p) => <PropertyCard key={p.id} p={p} />)}
         </div>
       </section>
 

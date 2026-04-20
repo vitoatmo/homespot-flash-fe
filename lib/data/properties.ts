@@ -1,109 +1,152 @@
+// Property data access — source of truth is Supabase.
+// Kept as type-only module; the old hardcoded array is removed.
+
+import { createClient } from "@/lib/supabase/server";
+
+export type PropertyCategory =
+  | "subsidi"
+  | "starter"
+  | "mid"
+  | "upper_mid"
+  | "premium"
+  | "luxury"
+  | "ultra_luxury";
+
+export type PropertyType =
+  | "rumah_tapak"
+  | "apartemen"
+  | "townhouse"
+  | "ruko"
+  | "villa"
+  | "penthouse"
+  | "rumah_subsidi";
+
 export type Property = {
-  id: string;
+  id: string;              // slug used in URLs
+  uuid: string;            // DB primary key
   title: string;
   developer: string;
   tier: "Tier 1" | "Tier 2" | "Tier 3";
-  location: string;
-  city: string;
-  price: number;       // IDR
+  location: string;        // city
+  city: string;            // province (kept backward-compat display)
+  price: number;           // IDR
   bedrooms: number;
   bathrooms: number;
-  landSize: number;    // m2
-  buildingSize: number;// m2
+  landSize: number;        // m2
+  buildingSize: number;    // m2
   image: string;
   hasVR: boolean;
   rating: number;
   features: string[];
   description: string;
+  category: PropertyCategory;
+  propertyType: PropertyType;
 };
 
-export const properties: Property[] = [
-  {
-    id: "grand-serenia-01",
-    title: "Grand Serenia Residence",
-    developer: "Sinar Mas Land",
-    tier: "Tier 1",
-    location: "BSD City",
-    city: "Tangerang Selatan",
-    price: 1_850_000_000,
-    bedrooms: 3, bathrooms: 2, landSize: 120, buildingSize: 95,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80",
-    hasVR: true, rating: 4.8,
-    features: ["Smart Home", "Clubhouse", "24/7 Security", "Dekat Stasiun BSD"],
-    description: "Cluster premium di BSD City dengan akses langsung ke The Breeze, AEON Mall, dan Stasiun BSD.",
-  },
-  {
-    id: "meikarta-02",
-    title: "Meikarta Distrik 1",
-    developer: "Lippo Group",
-    tier: "Tier 1",
-    location: "Cikarang",
-    city: "Bekasi",
-    price: 780_000_000,
-    bedrooms: 2, bathrooms: 1, landSize: 60, buildingSize: 45,
-    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&q=80",
-    hasVR: true, rating: 4.5,
-    features: ["CBD Akses", "Sekolah", "Rumah Sakit", "Mall"],
-    description: "Apartemen modern di pusat Meikarta, cocok untuk keluarga muda.",
-  },
-  {
-    id: "summarecon-03",
-    title: "Summarecon Serpong - Cluster Alamanda",
-    developer: "Summarecon Agung",
-    tier: "Tier 1",
-    location: "Serpong",
-    city: "Tangerang",
-    price: 2_450_000_000,
-    bedrooms: 4, bathrooms: 3, landSize: 160, buildingSize: 135,
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80",
-    hasVR: true, rating: 4.9,
-    features: ["Waterfront", "Golf Course", "International School", "Private Pool"],
-    description: "Rumah eksklusif menghadap danau, finishing premium, siap huni.",
-  },
-  {
-    id: "citraland-04",
-    title: "CitraLand Gama City",
-    developer: "Ciputra Group",
-    tier: "Tier 1",
-    location: "Medan",
-    city: "Medan",
-    price: 1_250_000_000,
-    bedrooms: 3, bathrooms: 2, landSize: 105, buildingSize: 85,
-    image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80",
-    hasVR: true, rating: 4.6,
-    features: ["Tol Akses", "Sekolah", "Kolam Renang Cluster", "CCTV"],
-    description: "Cluster dengan one-gate system, harga kompetitif di kawasan berkembang Medan.",
-  },
-  {
-    id: "paramount-05",
-    title: "Paramount Petals",
-    developer: "Paramount Land",
-    tier: "Tier 2",
-    location: "Curug",
-    city: "Tangerang",
-    price: 950_000_000,
-    bedrooms: 3, bathrooms: 2, landSize: 84, buildingSize: 70,
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80",
-    hasVR: false, rating: 4.3,
-    features: ["Akses Tol Balaraja", "Sekolah", "Jogging Track"],
-    description: "Hunian modern dengan konsep compact, lokasi strategis arah Serang.",
-  },
-  {
-    id: "podomoro-06",
-    title: "Podomoro Park Bandung",
-    developer: "Agung Podomoro",
-    tier: "Tier 1",
-    location: "Buah Batu",
-    city: "Bandung",
-    price: 1_650_000_000,
-    bedrooms: 3, bathrooms: 3, landSize: 110, buildingSize: 100,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80",
-    hasVR: true, rating: 4.7,
-    features: ["Tol Akses", "Central Park 8ha", "Tematik Cluster", "Smart Home"],
-    description: "Kawasan terintegrasi dengan central park seluas 8 hektar di Bandung selatan.",
-  },
-];
+type DbProperty = {
+  id: string;
+  slug: string;
+  title: string;
+  developer: string;
+  city: string;
+  province: string;
+  address: string | null;
+  bedrooms: number;
+  bathrooms: number;
+  land_m2: number | string;
+  building_m2: number | string;
+  price_idr: number;
+  vr_tour_url: string | null;
+  hero_image_url: string | null;
+  status: string;
+  property_type: PropertyType;
+  category: PropertyCategory;
+  description: string | null;
+  features: string[] | null;
+  rating: number | string | null;
+  tier: "Tier 1" | "Tier 2" | "Tier 3" | null;
+};
 
-export function findProperty(id: string) {
-  return properties.find((p) => p.id === id);
+function mapRow(r: DbProperty): Property {
+  return {
+    id: r.slug,
+    uuid: r.id,
+    title: r.title,
+    developer: r.developer,
+    tier: r.tier ?? "Tier 1",
+    location: r.city,
+    city: r.province,
+    price: Number(r.price_idr),
+    bedrooms: r.bedrooms,
+    bathrooms: r.bathrooms,
+    landSize: Number(r.land_m2),
+    buildingSize: Number(r.building_m2),
+    image: r.hero_image_url ?? "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80",
+    hasVR: !!r.vr_tour_url,
+    rating: Number(r.rating ?? 4.5),
+    features: Array.isArray(r.features) ? r.features : [],
+    description: r.description ?? "",
+    category: r.category,
+    propertyType: r.property_type,
+  };
 }
+
+export type PropertyFilter = {
+  maxPrice?: number;
+  minPrice?: number;
+  city?: string;
+  category?: PropertyCategory | "all";
+  propertyType?: PropertyType | "all";
+  search?: string;
+};
+
+export async function listProperties(f: PropertyFilter = {}): Promise<Property[]> {
+  const sb = await createClient();
+  let q = sb.from("properties").select("*").order("price_idr", { ascending: true });
+
+  if (f.maxPrice && f.maxPrice > 0) q = q.lte("price_idr", f.maxPrice);
+  if (f.minPrice && f.minPrice > 0) q = q.gte("price_idr", f.minPrice);
+  if (f.city && f.city !== "all") q = q.eq("city", f.city);
+  if (f.category && f.category !== "all") q = q.eq("category", f.category);
+  if (f.propertyType && f.propertyType !== "all") q = q.eq("property_type", f.propertyType);
+  if (f.search && f.search.trim()) q = q.ilike("title", `%${f.search.trim()}%`);
+
+  const { data, error } = await q;
+  if (error || !data) return [];
+  return (data as DbProperty[]).map(mapRow);
+}
+
+export async function findProperty(slug: string): Promise<Property | null> {
+  const sb = await createClient();
+  const { data, error } = await sb.from("properties").select("*").eq("slug", slug).maybeSingle();
+  if (error || !data) return null;
+  return mapRow(data as DbProperty);
+}
+
+export async function listCities(): Promise<string[]> {
+  const sb = await createClient();
+  const { data } = await sb.from("properties").select("city");
+  const set = new Set<string>();
+  (data ?? []).forEach((r: { city: string }) => set.add(r.city));
+  return Array.from(set).sort();
+}
+
+export const CATEGORY_LABEL: Record<PropertyCategory, string> = {
+  subsidi: "Subsidi FLPP",
+  starter: "Starter",
+  mid: "Mid",
+  upper_mid: "Upper Mid",
+  premium: "Premium",
+  luxury: "Luxury",
+  ultra_luxury: "Ultra Luxury",
+};
+
+export const TYPE_LABEL: Record<PropertyType, string> = {
+  rumah_tapak: "Rumah Tapak",
+  apartemen: "Apartemen",
+  townhouse: "Townhouse",
+  ruko: "Ruko",
+  villa: "Villa",
+  penthouse: "Penthouse",
+  rumah_subsidi: "Rumah Subsidi",
+};

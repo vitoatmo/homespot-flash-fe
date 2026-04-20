@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { SessionTimer } from "@/components/session-timer";
 
 export const metadata: Metadata = {
   title: "Homespot Flash Service — AI Approval, Instant Buy Decision",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <main className="min-h-[calc(100vh-8rem)]">{children}</main>
         <Footer />
+        <SessionTimer />
       </body>
     </html>
   );

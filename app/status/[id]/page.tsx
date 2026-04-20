@@ -10,7 +10,7 @@ import { CheckCircle2, Clock, Loader2, MessageCircle, Phone, FileText } from "lu
 
 export default async function StatusPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const property = findProperty("grand-serenia-01")!;
+  const property = await findProperty("grand-serenia-01");
   return (
     <div className="container max-w-5xl py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -100,8 +100,10 @@ export default async function StatusPage({ params }: { params: Promise<{ id: str
             <Separator />
             <div>
               <div className="text-xs text-muted-foreground">Properti</div>
-              <div className="font-semibold">{property.title}</div>
-              <div className="text-xs text-muted-foreground">{property.developer} · {property.city}</div>
+              <div className="font-semibold">{property?.title ?? "—"}</div>
+              <div className="text-xs text-muted-foreground">
+                {property ? `${property.developer} · ${property.city}` : "—"}
+              </div>
             </div>
             <Separator />
             <div className="space-y-2 text-sm">
