@@ -13,8 +13,9 @@ export function generateStaticParams() {
   return properties.map((p) => ({ id: p.id }));
 }
 
-export default function PropertyDetail({ params }: { params: { id: string } }) {
-  const p = findProperty(params.id);
+export default async function PropertyDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const p = findProperty(id);
   if (!p) notFound();
 
   const dp = p.price * 0.2;

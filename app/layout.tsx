@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   title: "Homespot Flash Service — AI Approval, Instant Buy Decision",
   description:
     "KPR BRI dalam satu sesi: AI pre-approval < 60 detik, VR property tour, dan komitmen pembelian instan.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

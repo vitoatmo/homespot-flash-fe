@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
@@ -15,6 +15,14 @@ import { formatIDR } from "@/lib/utils";
 import { CheckCircle2, PenSquare, ArrowRight, ShieldCheck, FileText } from "lucide-react";
 
 export default function ApplyPage() {
+  return (
+    <Suspense fallback={<div className="container max-w-5xl py-10">Loading…</div>}>
+      <ApplyInner />
+    </Suspense>
+  );
+}
+
+function ApplyInner() {
   const sp = useSearchParams();
   const propId = sp.get("property") || "grand-serenia-01";
   const property = findProperty(propId);

@@ -8,14 +8,15 @@ import { findProperty } from "@/lib/data/properties";
 import { formatIDR } from "@/lib/utils";
 import { CheckCircle2, Clock, Loader2, MessageCircle, Phone, FileText } from "lucide-react";
 
-export default function StatusPage({ params }: { params: { id: string } }) {
+export default async function StatusPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const property = findProperty("grand-serenia-01")!;
   return (
     <div className="container max-w-5xl py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <Badge variant="outline" className="border-accent text-accent">Status KPR</Badge>
-          <h1 className="mt-2 text-3xl font-bold md:text-4xl">Aplikasi #{params.id}</h1>
+          <h1 className="mt-2 text-3xl font-bold md:text-4xl">Aplikasi #{id}</h1>
           <p className="mt-2 text-muted-foreground">
             Update real-time · notifikasi WhatsApp + email di setiap perubahan.
           </p>
