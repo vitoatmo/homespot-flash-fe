@@ -155,17 +155,19 @@ export default function PreApprovalPage() {
     }
   };
 
+  // Demo prefill — fully generic placeholder. Tidak ada nama/NIK/NPWP asli
+  // supaya UI tidak menampilkan identitas pribadi developer.
   const fillDemo = () => {
     setForm({
-      fullName: "Vito Atmo",
-      nik: "3175061509910001",
-      npwp: "12.345.678.9-012.345",
-      phone: "+62 812 3456 7890",
-      employer: "PT Kreatif Digital Indonesia",
-      position: "Senior Digital Marketing Strategist",
-      age: 34,
-      yearsEmployed: 5,
-      monthlyIncome: 35000000,
+      fullName: "",
+      nik: "",
+      npwp: "",
+      phone: "",
+      employer: "",
+      position: "",
+      age: 30,
+      yearsEmployed: 3,
+      monthlyIncome: 15000000,
       existingDebt: 0,
     });
   };

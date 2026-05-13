@@ -5,7 +5,7 @@ import { AlertTriangle, CheckCircle2, ArrowRight, Clock, FileText, Search } from
 
 export const metadata = { title: "Findings — Homespot Flash" };
 
-// Data yang bisa Vito isi setelah audit homespot.id
+// Data findings — diisi setelah audit homespot.id
 const painPoints = [
   {
     area: "Discovery",

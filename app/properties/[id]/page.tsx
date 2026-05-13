@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { findProperty, CATEGORY_LABEL, TYPE_LABEL } from "@/lib/data/properties";
 import { VRViewer } from "@/components/vr-viewer";
+import { VRTour } from "@/components/organisms/vr-tour";
+import { getTourBySlug, getDemoTour } from "@/lib/data/vr-tours";
 import { PropertyApplyCta } from "@/components/property-apply-cta";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +18,11 @@ export default async function PropertyDetail({ params }: { params: Promise<{ id:
   const { id } = await params;
   const p = await findProperty(id);
   if (!p) notFound();
+
+  // Multi-scene tour kalau slug terdaftar; kalau tidak, fallback ke demo
+  // (supaya panel skripsi tetap dapat experience Bellefont-style untuk SEMUA properti).
+  // Replace getDemoTour() with `null` jika ingin VRViewer lama untuk properti tanpa tour.
+  const tour = getTourBySlug(p.id) ?? getDemoTour();
 
   const dp = p.price * 0.2;
   const loan = p.price - dp;
@@ -54,7 +61,11 @@ export default async function PropertyDetail({ params }: { params: Promise<{ id:
             </div>
           </div>
 
-          <VRViewer image={p.image} title={p.title} />
+          {tour ? (
+            <VRTour tour={tour} title={p.title} />
+          ) : (
+            <VRViewer image={p.image} title={p.title} />
+          )}
 
           <Tabs defaultValue="spec">
             <TabsList>
