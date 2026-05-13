@@ -3,6 +3,24 @@
 
 import { createClient } from "@/lib/supabase/server";
 
+// Extract Matterport model ID from any tour URL form.
+function matterportThumbnail(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (!u.hostname.includes("matterport.com")) return null;
+    let id = u.searchParams.get("m");
+    if (!id) {
+      const parts = u.pathname.split("/").filter(Boolean);
+      if (parts[0] === "models" && parts[1]) id = parts[1];
+    }
+    if (!id) return null;
+    return `https://my.matterport.com/api/v1/player/models/${id}/thumb?width=1280&dpr=1&disable=upscale`;
+  } catch {
+    return null;
+  }
+}
+
 export type PropertyCategory =
   | "subsidi"
   | "starter"
@@ -36,6 +54,7 @@ export type Property = {
   buildingSize: number;    // m2
   image: string;
   hasVR: boolean;
+  vrTourUrl: string | null;
   rating: number;
   features: string[];
   description: string;
@@ -81,8 +100,12 @@ function mapRow(r: DbProperty): Property {
     bathrooms: r.bathrooms,
     landSize: Number(r.land_m2),
     buildingSize: Number(r.building_m2),
-    image: r.hero_image_url ?? "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80",
+    image:
+      r.hero_image_url ??
+      matterportThumbnail(r.vr_tour_url) ??
+      "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80",
     hasVR: !!r.vr_tour_url,
+    vrTourUrl: r.vr_tour_url ?? null,
     rating: Number(r.rating ?? 4.5),
     features: Array.isArray(r.features) ? r.features : [],
     description: r.description ?? "",

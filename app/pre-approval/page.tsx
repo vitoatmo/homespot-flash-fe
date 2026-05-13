@@ -9,12 +9,13 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { formatIDR } from "@/lib/utils";
 import { saveSessionApplicant } from "@/lib/session-data";
+import { AiExplainCard } from "@/components/organisms/ai-explain-card";
 import {
-  ShieldCheck, CheckCircle2, Brain, ArrowRight, Sparkles, Clock, Lock,
+  ShieldCheck, CheckCircle2, Brain, ArrowRight, Lock,
   AlertTriangle, RefreshCw, User,
 } from "lucide-react";
+import { formatIDR } from "@/lib/utils";
 
 type Step = "consent" | "scoring" | "result" | "error";
 
@@ -143,6 +144,9 @@ export default function PreApprovalPage() {
           monthly_installment_idr: data.monthly_installment_idr,
           dti_ratio_pct: data.dti_ratio_pct,
           application_code: data.application_code,
+          latency_ms: data.latency_ms,
+          model: data.model,
+          created_at: new Date().toISOString(),
         },
       });
 
@@ -175,14 +179,14 @@ export default function PreApprovalPage() {
   const resetForm = () => setForm(emptyForm);
 
   return (
-    <div className="container max-w-4xl py-10">
+    <div className="container max-w-4xl py-5 sm:py-10">
       <Badge variant="outline" className="border-accent text-accent">KNOW · AI Pre-Approval</Badge>
-      <h1 className="mt-2 text-3xl font-bold md:text-4xl">Cek Limit Kilat</h1>
-      <p className="mt-2 text-muted-foreground">
+      <h1 className="mt-2 text-2xl font-bold sm:text-3xl md:text-4xl">Cek Limit Kilat</h1>
+      <p className="mt-2 text-sm text-muted-foreground sm:text-base">
         Kejelasan finansial sebelum kamu lihat properti. Hasil dalam &lt; 60 detik — powered by Groq LPU + Llama 3.3 70B.
       </p>
 
-      <div className="mt-8">
+      <div className="mt-5 sm:mt-8">
         {step === "consent" && (
           <ConsentStep
             form={form}
@@ -212,11 +216,12 @@ function ConsentStep({
   onReset: () => void;
 }) {
   return (
-    <Card className="p-6 md:p-8">
-      <div className="flex items-center justify-between gap-2">
+    <>
+    <Card className="p-4 sm:p-6 md:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Isi data pribadi kamu</h2>
+          <h2 className="text-lg font-semibold sm:text-xl">Isi data pribadi kamu</h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={onDemo}>
@@ -267,7 +272,8 @@ function ConsentStep({
         </p>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      {/* Desktop inline CTA */}
+      <div className="mt-6 hidden flex-wrap items-center gap-3 sm:flex">
         <Button size="lg" onClick={onStart} disabled={!isValid}>
           Setuju &amp; Cek Limit <ArrowRight className="h-4 w-4" />
         </Button>
@@ -276,11 +282,25 @@ function ConsentStep({
         </div>
       </div>
       {!isValid && (
-        <p className="mt-2 text-xs text-rose-600">
+        <p className="mt-2 hidden text-xs text-rose-600 sm:block">
           Nama, usia, lama kerja, dan penghasilan wajib diisi untuk scoring.
         </p>
       )}
+      {/* Spacer for mobile sticky bar */}
+      <div className="h-20 sm:hidden" />
     </Card>
+    {/* Mobile sticky bottom CTA */}
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 px-4 py-3 pb-[max(env(safe-area-inset-bottom),0.75rem)] backdrop-blur sm:hidden">
+      <Button size="lg" className="w-full" onClick={onStart} disabled={!isValid}>
+        Setuju &amp; Cek Limit <ArrowRight className="h-4 w-4" />
+      </Button>
+      {!isValid && (
+        <p className="mt-1.5 text-center text-[11px] text-rose-600">
+          Nama, usia, lama kerja, dan penghasilan wajib diisi.
+        </p>
+      )}
+    </div>
+    </>
   );
 }
 
@@ -317,80 +337,39 @@ function ScoringStep({ progress }: { progress: number }) {
 }
 
 function ResultStep({ r }: { r: ScoreResult }) {
-  const tierStyle =
-    r.tier === "Green" ? "from-emerald-600 to-emerald-700"
-      : r.tier === "Amber" ? "from-amber-500 to-orange-600"
-      : "from-rose-600 to-red-700";
-
-  const tierLabel =
-    r.tier === "Green" ? "Approved" : r.tier === "Amber" ? "Review oleh CLF" : "Tidak memenuhi syarat";
+  const matchHref = r.approved_limit_idr > 0
+    ? `/properties?maxPrice=${r.approved_limit_idr}`
+    : "/properties";
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden">
-        <div className={`bg-gradient-to-br ${tierStyle} p-6 text-white md:p-8`}>
-          <div className="flex items-start justify-between">
-            <div>
-              <Badge variant="secondary" className="bg-white/20 text-white">{r.confidence} · {tierLabel}</Badge>
-              <div className="mt-3 text-sm text-white/80">Limit kredit kamu</div>
-              <div className="text-4xl font-bold">{formatIDR(r.approved_limit_idr)}</div>
-              <div className="mt-1 text-sm text-white/80">
-                Tenor max {r.max_tenor_months / 12} tahun · bunga estimasi {r.estimated_rate}%
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-xs text-white/80">Skor AI</div>
-              <div className="text-4xl font-bold">{r.score}</div>
-              <div className="text-xs text-white/80">/ 100</div>
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
-            <div className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1">
-              <Clock className="h-4 w-4" /> {(r.latency_ms / 1000).toFixed(2)} detik
-            </div>
-            <div className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1">
-              <Sparkles className="h-4 w-4" /> {r.model}
-            </div>
-            <div className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1">
-              <ShieldCheck className="h-4 w-4" /> DTI {r.dti_ratio_pct.toFixed(1)}%
-            </div>
-          </div>
-        </div>
+      <AiExplainCard
+        variant="full"
+        tier={r.tier}
+        score={r.score}
+        confidence={r.confidence}
+        top_reasons={r.top_reasons}
+        latency_ms={r.latency_ms}
+        model={r.model}
+        dti_ratio_pct={r.dti_ratio_pct}
+        approved_limit_idr={r.approved_limit_idr}
+        estimated_rate={r.estimated_rate}
+        max_tenor_months={r.max_tenor_months}
+        monthly_installment_idr={r.monthly_installment_idr}
+      />
 
-        <div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
-          <div>
-            <h3 className="font-semibold">Kenapa {tierLabel.toLowerCase()}?</h3>
-            <ul className="mt-3 space-y-2 text-sm">
-              {r.top_reasons.map((t, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold">Estimasi cicilan</h3>
-            <div className="mt-3 rounded-lg bg-bri-light p-4">
-              <div className="text-xs text-muted-foreground">Untuk plafon {formatIDR(r.approved_limit_idr)}</div>
-              <div className="text-2xl font-bold text-primary">
-                {formatIDR(r.monthly_installment_idr)}
-                <span className="text-sm font-normal text-muted-foreground"> / bulan</span>
-              </div>
-              <div className="mt-1 text-xs text-muted-foreground">
-                @ {r.estimated_rate}% p.a. · tenor {r.max_tenor_months / 12} tahun
-              </div>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <Button className="flex-1" asChild disabled={r.tier === "Red"}>
-                <Link href="/properties">Pilih properti <ArrowRight className="h-4 w-4" /></Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/apply?property=grand-serenia-01">Apply langsung</Link>
-              </Button>
-            </div>
+      <Card className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="text-sm">
+          <div className="font-semibold">Langkah berikutnya</div>
+          <div className="text-muted-foreground">
+            Lihat properti yang sesuai limit kamu — KNOW kamu sudah selesai, saatnya FEEL.
           </div>
         </div>
+        <Button className="sm:shrink-0" asChild disabled={r.tier === "Red"}>
+          <Link href={matchHref}>
+            Lihat properti sesuai limitku <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </Card>
 
       <Card className="p-6">

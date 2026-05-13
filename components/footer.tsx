@@ -1,9 +1,9 @@
 export function Footer() {
   return (
-    <footer className="mt-20 border-t bg-primary text-primary-foreground">
-      <div className="container grid gap-8 py-10 md:grid-cols-4">
-        <div>
-          <div className="text-lg font-bold">Homespot Flash Service</div>
+    <footer className="mt-12 border-t bg-primary text-primary-foreground sm:mt-20">
+      <div className="container grid gap-6 py-8 sm:gap-8 sm:py-10 sm:grid-cols-2 md:grid-cols-4">
+        <div className="col-span-full sm:col-span-2 md:col-span-1">
+          <div className="text-base font-bold sm:text-lg">Homespot Flash Service</div>
           <p className="mt-2 text-sm text-white/70">
             AI-based approval, instant buying decision. One-session commitment untuk KPR BRI.
           </p>
@@ -32,7 +32,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-white/60">
+      <div className="border-t border-white/10 px-4 py-4 pb-[max(env(safe-area-inset-bottom),1rem)] text-center text-[11px] text-white/60 sm:text-xs">
         © 2026 Bank BRI · Homespot Flash Service · Prototype (Thesis-backed)
       </div>
     </footer>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Zap, BookOpen, Menu, X, ChevronDown } from "lucide-react";
@@ -23,16 +23,30 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const [thesisOpen, setThesisOpen] = useState(false);
 
+  // Lock scroll & close on ESC
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+      window.addEventListener("keydown", onKey);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", onKey);
+      };
+    }
+    document.body.style.overflow = "";
+  }, [open]);
+
   return (
     <header className="sticky top-0 z-40 border-b bg-white/90 backdrop-blur">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Zap className="h-5 w-5" />
+      <div className="container flex h-14 items-center justify-between sm:h-16">
+        <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground sm:h-9 sm:w-9">
+            <Zap className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
           <div className="leading-tight">
             <div className="text-sm font-bold text-primary">Homespot</div>
-            <div className="text-xs text-accent">Flash Service</div>
+            <div className="text-[10px] text-accent sm:text-xs">Flash Service</div>
           </div>
         </Link>
 
@@ -78,48 +92,69 @@ export function Nav() {
           </Button>
         </div>
 
-        {/* Mobile toggle */}
+        {/* Mobile toggle (44px touch) */}
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-md border md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-md border md:hidden"
           onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
+          aria-label="Buka menu"
+          aria-expanded={open}
         >
-          {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer overlay */}
       {open && (
-        <div className="border-t bg-white md:hidden">
-          <div className="container space-y-1 py-3">
-            {productLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
+        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute inset-y-0 right-0 flex w-[85vw] max-w-sm flex-col bg-white shadow-2xl">
+            <div className="flex h-14 items-center justify-between border-b px-4">
+              <div className="text-sm font-semibold text-primary">Menu</div>
+              <button
                 onClick={() => setOpen(false)}
-                className="block rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+                className="flex h-10 w-10 items-center justify-center rounded-md hover:bg-muted"
+                aria-label="Tutup menu"
               >
-                {l.label}
-              </Link>
-            ))}
-            <div className="pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground px-3">
-              Thesis
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            {thesisLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="block rounded-md px-3 py-2 text-sm hover:bg-muted"
-              >
-                {l.label}
-              </Link>
-            ))}
-            <div className="flex gap-2 pt-3">
-              <Button variant="outline" size="sm" className="flex-1" asChild>
+            <div className="flex-1 overflow-y-auto px-3 py-4">
+              <div className="space-y-1">
+                {productLinks.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-md px-3 py-3 text-sm font-medium hover:bg-muted"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-4 px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Thesis
+              </div>
+              <div className="space-y-1">
+                {thesisLinks.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-md px-3 py-2.5 text-sm hover:bg-muted"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2 border-t p-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
+              <Button variant="outline" className="flex-1" asChild>
                 <Link href="/pre-approval" onClick={() => setOpen(false)}>Cek Limit</Link>
               </Button>
-              <Button size="sm" className="flex-1" asChild>
+              <Button className="flex-1" asChild>
                 <Link href="/properties" onClick={() => setOpen(false)}>Mulai</Link>
               </Button>
             </div>

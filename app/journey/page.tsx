@@ -94,7 +94,7 @@ const decidePhase: Step[] = [
   {
     time: "4:00",
     action: "Klik 'Apply dengan limit ini' — form sudah auto-filled",
-    touchpoint: "/apply?property=grand-serenia-01",
+    touchpoint: "/properties?maxPrice={limit} → /apply",
     thinking: "Semua data udah terisi dari consent tadi. Tinggal review aja.",
     feeling: "happy",
     icon: <PenSquare className="h-5 w-5" />,
@@ -128,12 +128,12 @@ const decidePhase: Step[] = [
 
 export default function JourneyPage() {
   return (
-    <div className="container max-w-6xl py-10">
+    <div className="container max-w-6xl py-5 sm:py-10">
       <Badge variant="outline" className="border-accent text-accent">
-        Thesis Methodology — Customer Journey Mapping (Kalbach, 2020)
+        Customer Journey Mapping
       </Badge>
-      <h1 className="mt-2 text-3xl font-bold md:text-4xl">Customer Journey Map</h1>
-      <p className="mt-2 max-w-3xl text-muted-foreground">
+      <h1 className="mt-2 text-2xl font-bold sm:text-3xl md:text-4xl">Customer Journey Map</h1>
+      <p className="mt-2 max-w-3xl text-sm text-muted-foreground sm:text-base">
         Visualisasi end-to-end user journey di Homespot Flash Service. Dibagi tiga fase framework
         konseptual thesis: <span className="font-semibold text-primary">KNOW</span> →{" "}
         <span className="font-semibold text-accent">FEEL</span> →{" "}
@@ -150,8 +150,8 @@ export default function JourneyPage() {
       </div>
 
       {/* Summary metric bar */}
-      <Card className="mt-8 overflow-hidden">
-        <div className="grid gap-0 md:grid-cols-4">
+      <Card className="mt-6 overflow-hidden sm:mt-8">
+        <div className="grid grid-cols-2 gap-0 md:grid-cols-4">
           <Metric label="Total active session" value="~5 min" icon={<Clock className="h-4 w-4" />} />
           <Metric label="Total touchpoint" value="12 step" icon={<ArrowRight className="h-4 w-4" />} />
           <Metric label="Pain points teridentifikasi" value="3" icon={<AlertTriangle className="h-4 w-4" />} />
@@ -188,10 +188,10 @@ export default function JourneyPage() {
       />
 
       {/* Mapped to thesis findings */}
-      <Card className="mt-12 bg-bri-light p-6">
+      <Card className="mt-8 bg-bri-light p-5 sm:mt-12 sm:p-6">
         <h2 className="font-semibold">Insight Mapping ke Thesis</h2>
         <Separator className="my-4" />
-        <div className="grid gap-4 text-sm md:grid-cols-3">
+        <div className="grid gap-3 text-sm sm:gap-4 md:grid-cols-3">
           <Insight
             title="Research Question 1 — AI Engagement"
             text="Tervalidasi visual: AI pre-approval di awal journey (step 0:30–1:15) kasih 'immediate financial clarity' — user langsung masuk ke fase FEEL dengan confidence."
@@ -234,23 +234,23 @@ function Phase({
   }[color];
 
   return (
-    <section className="mt-12">
+    <section className="mt-8 sm:mt-12">
       <div className="flex items-start gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${colorClass}`}>
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${colorClass}`}>
           {icon}
         </div>
-        <div>
+        <div className="min-w-0">
           <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Fase {idx}
           </div>
-          <h2 className="text-xl font-bold md:text-2xl">{title}</h2>
+          <h2 className="text-lg font-bold sm:text-xl md:text-2xl">{title}</h2>
           <p className="text-sm text-muted-foreground">{subtitle}</p>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
         {steps.map((s, i) => (
-          <Card key={i} className="flex flex-col p-5">
+          <Card key={i} className="flex flex-col p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="font-mono text-xs">{s.time}</Badge>
               {s.feeling === "happy" && <Smile className="h-4 w-4 text-emerald-600" />}
@@ -299,12 +299,12 @@ function Metric({
   last?: boolean;
 }) {
   return (
-    <div className={`p-5 ${last ? "" : "md:border-r"}`}>
+    <div className={`border-b p-4 last:border-b-0 sm:p-5 md:border-b-0 ${last ? "" : "md:border-r"}`}>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {icon}
         {label}
       </div>
-      <div className="mt-1 text-2xl font-bold text-primary">{value}</div>
+      <div className="mt-1 text-xl font-bold text-primary sm:text-2xl">{value}</div>
     </div>
   );
 }

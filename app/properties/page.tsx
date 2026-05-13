@@ -52,35 +52,33 @@ export default async function PropertiesPage({
     !!search;
 
   return (
-    <div className="container py-10">
+    <div className="container py-5 sm:py-8 lg:py-10">
       {/* Session banner (shows approved limit if user has done pre-approval) */}
       <Suspense fallback={null}>
         <SessionAwareBanner />
       </Suspense>
 
-      <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <Badge variant="outline" className="mb-2 border-accent text-accent">
-            Katalog Properti
-          </Badge>
-          <h1 className="text-3xl font-bold md:text-4xl">
-            {items.length} properti {hasFilter ? "sesuai filter" : "aktif"}
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Dari subsidi FLPP sampai ultra-luxury — AI bantu pilih sesuai limit kamu.
-          </p>
-        </div>
+      <div className="mt-3 sm:mt-4">
+        <Badge variant="outline" className="mb-2 border-accent text-accent">
+          Katalog Properti
+        </Badge>
+        <h1 className="text-2xl font-bold sm:text-3xl md:text-4xl">
+          {items.length} properti {hasFilter ? "sesuai filter" : "aktif"}
+        </h1>
+        <p className="mt-1.5 text-sm text-muted-foreground sm:mt-2 sm:text-base">
+          Dari subsidi FLPP sampai ultra-luxury — AI bantu pilih sesuai limit kamu.
+        </p>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
+      <div className="mt-5 grid gap-6 sm:mt-8 lg:grid-cols-[280px_1fr] lg:gap-8">
         <PropertyFilters cities={cities} />
         <div>
           {items.length === 0 ? (
-            <div className="rounded-xl border bg-muted/30 p-10 text-center text-sm text-muted-foreground">
+            <div className="rounded-xl border bg-muted/30 p-6 text-center text-sm text-muted-foreground sm:p-10">
               Tidak ada properti yang cocok dengan filter. Coba ubah rentang harga atau kota.
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
               {items.map((p) => (
                 <PropertyCard key={p.id} p={p} />
               ))}

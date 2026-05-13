@@ -33,6 +33,11 @@ export type SessionApplicant = {
     monthly_installment_idr: number;
     dti_ratio_pct: number;
     application_code?: string;
+    // AI explainability metadata — preserved so /apply & /status can
+    // re-render <AiExplainCard> without re-calling /api/score.
+    latency_ms?: number;
+    model?: string;
+    created_at?: string; // ISO timestamp when score was issued
   };
   // Selected property (set when user clicks Apply on detail page)
   selectedProperty?: {

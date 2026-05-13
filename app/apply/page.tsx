@@ -12,6 +12,7 @@ import { loadSessionApplicant, type SessionApplicant } from "@/lib/session-data"
 import { CheckCircle2, PenSquare, ArrowRight, ShieldCheck, FileText, AlertCircle } from "lucide-react";
 import { Field } from "@/components/molecules/field";
 import { Row } from "@/components/molecules/row";
+import { AiExplainCard } from "@/components/organisms/ai-explain-card";
 
 export default function ApplyPage() {
   return (
@@ -39,16 +40,16 @@ function ApplyInner() {
 
   // Loading state (prevents hydration mismatch)
   if (!loaded) {
-    return <div className="container max-w-5xl py-10 text-sm text-muted-foreground">Loading session…</div>;
+    return <div className="container max-w-5xl py-5 text-sm text-muted-foreground sm:py-10">Loading session…</div>;
   }
 
   // No session data → prompt user to run pre-approval first
   if (!session) {
     return (
-      <div className="container max-w-3xl py-10">
+      <div className="container max-w-3xl py-5 sm:py-10">
         <Badge variant="outline" className="border-accent text-accent">DECIDE · One-Session Commitment</Badge>
-        <h1 className="mt-2 text-3xl font-bold md:text-4xl">Ajukan KPR</h1>
-        <Card className="mt-6 border-amber-300 bg-amber-50 p-6">
+        <h1 className="mt-2 text-2xl font-bold sm:text-3xl md:text-4xl">Ajukan KPR</h1>
+        <Card className="mt-5 border-amber-300 bg-amber-50 p-5 sm:mt-6 sm:p-6">
           <div className="flex items-start gap-3">
             <AlertCircle className="mt-0.5 h-5 w-5 text-amber-700" />
             <div className="text-sm">
@@ -76,31 +77,31 @@ function ApplyInner() {
   const defaultRate = score?.estimated_rate ?? 6.75;
 
   return (
-    <div className="container max-w-5xl py-10">
+    <div className="container max-w-5xl pb-24 pt-5 sm:py-10">
       <Badge variant="outline" className="border-accent text-accent">DECIDE · One-Session Commitment</Badge>
-      <h1 className="mt-2 text-3xl font-bold md:text-4xl">Ajukan KPR</h1>
-      <p className="mt-2 text-muted-foreground">
+      <h1 className="mt-2 text-2xl font-bold sm:text-3xl md:text-4xl">Ajukan KPR</h1>
+      <p className="mt-2 text-sm text-muted-foreground sm:text-base">
         Form terisi otomatis dari data yang kamu input di pre-approval. Review &amp; tanda tangan digital.
       </p>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-3">
-        <form className="space-y-6 lg:col-span-2">
-          <Card className="p-6">
-            <h2 className="font-semibold">Data Pemohon (auto-filled dari pre-approval)</h2>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <div className="mt-5 grid gap-5 sm:mt-8 sm:gap-8 lg:grid-cols-3">
+        <form className="space-y-5 sm:space-y-6 lg:col-span-2 lg:order-1">
+          <Card className="p-4 sm:p-6">
+            <h2 className="text-sm font-semibold sm:text-base">Data Pemohon (auto-filled dari pre-approval)</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label="Nama lengkap" value={session.fullName} />
               <Field label="NIK" value={session.nik ?? ""} />
               <Field label="NPWP" value={session.npwp ?? ""} />
               <Field label="No. HP" value={session.phone ?? ""} />
               <Field label="Usia" value={String(session.age)} type="number" />
               <Field label="Email" value={session.email ?? ""} type="email" />
-              <Field label="Alamat" value={session.homeAddress ?? ""} className="md:col-span-2" placeholder="Alamat sesuai KTP" />
+              <Field label="Alamat" value={session.homeAddress ?? ""} className="sm:col-span-2" placeholder="Alamat sesuai KTP" />
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h2 className="font-semibold">Pekerjaan &amp; Penghasilan</h2>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <Card className="p-4 sm:p-6">
+            <h2 className="text-sm font-semibold sm:text-base">Pekerjaan &amp; Penghasilan</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label="Perusahaan" value={session.employer ?? ""} />
               <Field label="Jabatan" value={session.position ?? ""} />
               <Field label="Masa kerja (tahun)" value={String(session.yearsEmployed)} type="number" />
@@ -111,14 +112,14 @@ function ApplyInner() {
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h2 className="font-semibold">Properti yang Diajukan</h2>
+          <Card className="p-4 sm:p-6">
+            <h2 className="text-sm font-semibold sm:text-base">Properti yang Diajukan</h2>
             {property && (
-              <div className="mt-4 flex items-start gap-4 rounded-lg bg-bri-light p-4">
-                <div className="flex-1">
+              <div className="mt-4 flex flex-wrap items-start gap-3 rounded-lg bg-bri-light p-4 sm:gap-4">
+                <div className="min-w-0 flex-1">
                   <div className="text-xs text-muted-foreground">{property.developer}</div>
-                  <div className="font-semibold">{property.title}</div>
-                  <div className="text-sm text-muted-foreground">{property.location}, {property.city}</div>
+                  <div className="line-clamp-1 font-semibold">{property.title}</div>
+                  <div className="line-clamp-1 text-sm text-muted-foreground">{property.location}, {property.city}</div>
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-muted-foreground">Harga</div>
@@ -126,21 +127,21 @@ function ApplyInner() {
                 </div>
               </div>
             )}
-            <div className="mt-4 grid gap-4 md:grid-cols-3">
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
               <Field label="DP (%)" value="20" type="number" />
               <Field label="Tenor (tahun)" value={String(defaultTenor)} type="number" />
               <Field label="Program bunga" value={`Fixed 3 thn · ${defaultRate}%`} />
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h2 className="flex items-center gap-2 font-semibold">
+          <Card className="p-4 sm:p-6">
+            <h2 className="flex items-center gap-2 text-sm font-semibold sm:text-base">
               <PenSquare className="h-4 w-4 text-accent" /> Tanda Tangan Digital (PeruriSign)
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               Setelah tanda tangan, aplikasi langsung diverifikasi &amp; e-SPH disiapkan.
             </p>
-            <div className="mt-4 flex h-32 items-center justify-center rounded-lg border-2 border-dashed bg-muted/50">
+            <div className="mt-4 flex h-28 items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 sm:h-32">
               {signed ? (
                 <div className="flex items-center gap-2 font-semibold text-emerald-600">
                   <CheckCircle2 className="h-5 w-5" />
@@ -158,16 +159,33 @@ function ApplyInner() {
             </div>
           </Card>
 
-          <Button size="lg" className="w-full" asChild disabled={!signed}>
+          {/* Desktop inline submit */}
+          <Button size="lg" className="hidden w-full sm:flex" asChild disabled={!signed}>
             <Link href={signed ? `/status/${score?.application_code ?? "APP-2026-00042"}` : "#"}>
               Submit &amp; lihat status <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </form>
 
-        {/* Sticky summary */}
-        <aside className="lg:sticky lg:top-20 lg:self-start">
-          <Card className="space-y-4 p-6">
+        {/* Summary — moves below on mobile (order-1), sticky on desktop */}
+        <aside className="space-y-4 lg:sticky lg:top-20 lg:order-2 lg:self-start">
+          {score && (
+            <AiExplainCard
+              variant="compact"
+              tier={score.tier}
+              score={score.score}
+              confidence={score.confidence}
+              top_reasons={score.top_reasons}
+              latency_ms={score.latency_ms ?? 0}
+              model={score.model ?? "llama-3.3-70b-versatile"}
+              dti_ratio_pct={score.dti_ratio_pct}
+              approved_limit_idr={score.approved_limit_idr}
+              estimated_rate={score.estimated_rate}
+              max_tenor_months={score.max_tenor_months}
+              monthly_installment_idr={score.monthly_installment_idr}
+            />
+          )}
+          <Card className="space-y-4 p-5 sm:p-6">
             <div>
               <div className="text-xs text-muted-foreground">Pre-approval aktif</div>
               <div className="text-xl font-bold text-primary">
@@ -203,6 +221,15 @@ function ApplyInner() {
             )}
           </Card>
         </aside>
+      </div>
+
+      {/* Mobile sticky submit */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 px-4 py-3 pb-[max(env(safe-area-inset-bottom),0.75rem)] backdrop-blur sm:hidden">
+        <Button size="lg" className="w-full" asChild disabled={!signed}>
+          <Link href={signed ? `/status/${score?.application_code ?? "APP-2026-00042"}` : "#"}>
+            {signed ? "Submit & lihat status" : "Tanda tangan dulu"} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
     </div>
   );

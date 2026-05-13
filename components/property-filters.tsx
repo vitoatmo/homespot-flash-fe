@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Filter, Sparkles, X } from "lucide-react";
 import { loadSessionApplicant } from "@/lib/session-data";
 import { formatIDR } from "@/lib/utils";
@@ -37,11 +38,21 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
   const sp = useSearchParams();
   const [pending, startTransition] = useTransition();
   const [approvedLimit, setApprovedLimit] = useState<number | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const s = loadSessionApplicant();
     if (s?.score?.approved_limit_idr) setApprovedLimit(s.score.approved_limit_idr);
   }, []);
+
+  // Lock body scroll when mobile drawer open
+  useEffect(() => {
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
   const params = (overrides: Record<string, string | undefined>) => {
     const next = new URLSearchParams(sp.toString());
@@ -74,29 +85,20 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
     push({ maxPrice: String(approvedLimit) });
   };
 
-  const hasAny =
-    current.maxPrice || current.minPrice || current.city !== "all" ||
-    current.category !== "all" || current.type !== "all" || current.q;
+  const activeCount =
+    (current.maxPrice ? 1 : 0) +
+    (current.minPrice ? 1 : 0) +
+    (current.city !== "all" ? 1 : 0) +
+    (current.category !== "all" ? 1 : 0) +
+    (current.type !== "all" ? 1 : 0) +
+    (current.q ? 1 : 0);
 
-  return (
-    <Card className="sticky top-20 h-fit p-5">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 font-semibold">
-          <Filter className="h-4 w-4" /> Filter
-        </div>
-        {hasAny && (
-          <button
-            onClick={clearAll}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-            disabled={pending}
-          >
-            <X className="h-3 w-3" /> Reset
-          </button>
-        )}
-      </div>
+  const hasAny = activeCount > 0;
 
+  const FilterBody = (
+    <>
       {approvedLimit && (
-        <div className="mt-4 rounded-lg border border-accent/40 bg-accent/5 p-3">
+        <div className="rounded-lg border border-accent/40 bg-accent/5 p-3">
           <div className="flex items-center gap-1 text-xs font-semibold text-accent">
             <Sparkles className="h-3 w-3" /> Limit pre-approval kamu
           </div>
@@ -107,7 +109,10 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
             size="sm"
             variant="accent"
             className="mt-3 w-full"
-            onClick={applyAIMatch}
+            onClick={() => {
+              applyAIMatch();
+              setOpen(false);
+            }}
             disabled={pending}
           >
             Filter sesuai limit saya
@@ -115,7 +120,7 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
         </div>
       )}
 
-      <div className="mt-5 space-y-4">
+      <div className="space-y-4">
         <div>
           <Label className="text-xs text-muted-foreground">Cari nama</Label>
           <Input
@@ -135,7 +140,7 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
             value={current.category}
             onChange={(e) => push({ category: e.target.value })}
             disabled={pending}
-            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-11 w-full rounded-md border bg-background px-3 text-sm sm:h-9"
           >
             {CATEGORIES.map((c) => (
               <option key={c.value} value={c.value}>{c.label}</option>
@@ -149,7 +154,7 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
             value={current.type}
             onChange={(e) => push({ type: e.target.value })}
             disabled={pending}
-            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-11 w-full rounded-md border bg-background px-3 text-sm sm:h-9"
           >
             {TYPES.map((c) => (
               <option key={c.value} value={c.value}>{c.label}</option>
@@ -163,7 +168,7 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
             value={current.city}
             onChange={(e) => push({ city: e.target.value })}
             disabled={pending}
-            className="mt-1 h-9 w-full rounded-md border bg-background px-3 text-sm"
+            className="mt-1 h-11 w-full rounded-md border bg-background px-3 text-sm sm:h-9"
           >
             <option value="all">Semua kota</option>
             {cities.map((c) => (
@@ -177,6 +182,7 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
             <Label className="text-xs text-muted-foreground">Min (Rp)</Label>
             <Input
               type="number"
+              inputMode="numeric"
               defaultValue={current.minPrice}
               placeholder="0"
               onBlur={(e) => push({ minPrice: e.currentTarget.value })}
@@ -187,6 +193,7 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
             <Label className="text-xs text-muted-foreground">Max (Rp)</Label>
             <Input
               type="number"
+              inputMode="numeric"
               defaultValue={current.maxPrice}
               placeholder="∞"
               onBlur={(e) => push({ maxPrice: e.currentTarget.value })}
@@ -195,6 +202,113 @@ export function PropertyFilters({ cities }: { cities: string[] }) {
           </div>
         </div>
       </div>
-    </Card>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile trigger — sticky chip-style bar */}
+      <div className="sticky top-16 z-20 -mx-4 mb-4 flex items-center gap-2 border-b bg-background/95 px-4 py-2 backdrop-blur lg:hidden">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setOpen(true)}
+          className="gap-1"
+        >
+          <Filter className="h-4 w-4" />
+          Filter
+          {activeCount > 0 && (
+            <Badge variant="accent" className="ml-1 h-5 min-w-5 justify-center px-1.5 text-[10px]">
+              {activeCount}
+            </Badge>
+          )}
+        </Button>
+        {hasAny && (
+          <button
+            onClick={clearAll}
+            disabled={pending}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <X className="h-3 w-3" /> Reset
+          </button>
+        )}
+        {approvedLimit && (
+          <button
+            onClick={applyAIMatch}
+            disabled={pending}
+            className="ml-auto flex items-center gap-1 rounded-full border border-accent/40 bg-accent/5 px-2.5 py-1 text-[11px] font-medium text-accent"
+          >
+            <Sparkles className="h-3 w-3" /> Sesuai limit
+          </button>
+        )}
+      </div>
+
+      {/* Desktop sidebar */}
+      <Card className="sticky top-20 hidden h-fit space-y-5 p-5 lg:block">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 font-semibold">
+            <Filter className="h-4 w-4" /> Filter
+          </div>
+          {hasAny && (
+            <button
+              onClick={clearAll}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              disabled={pending}
+            >
+              <X className="h-3 w-3" /> Reset
+            </button>
+          )}
+        </div>
+        {FilterBody}
+      </Card>
+
+      {/* Mobile drawer */}
+      {open && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute inset-x-0 bottom-0 max-h-[88vh] overflow-y-auto rounded-t-2xl bg-background pb-[max(env(safe-area-inset-bottom),1rem)] shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 py-3">
+              <div className="flex items-center gap-2 font-semibold">
+                <Filter className="h-4 w-4" /> Filter
+                {activeCount > 0 && (
+                  <Badge variant="accent" className="h-5 min-w-5 justify-center px-1.5 text-[10px]">
+                    {activeCount}
+                  </Badge>
+                )}
+              </div>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Tutup"
+                className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-5 p-4">{FilterBody}</div>
+            <div className="sticky bottom-0 flex gap-2 border-t bg-background px-4 py-3">
+              {hasAny && (
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    clearAll();
+                    setOpen(false);
+                  }}
+                  disabled={pending}
+                >
+                  Reset
+                </Button>
+              )}
+              <Button className="flex-1" onClick={() => setOpen(false)}>
+                Lihat hasil
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
