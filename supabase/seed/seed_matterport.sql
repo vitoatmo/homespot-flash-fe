@@ -1,6 +1,8 @@
 -- Matterport seed — generated from 'MATTERPORT UPDATE - 13 des 25.xlsx'
 -- Wipe & replace catalog properties.
+-- Run AFTER supabase/schema.sql. Objects live in schema `homespot`.
 BEGIN;
+SET search_path = homespot, public;
 DELETE FROM applications;  -- FK cleanup
 DELETE FROM ai_scores;
 DELETE FROM property_tours;
